@@ -60,16 +60,10 @@ else:
     
 
 # Run selection
-if selectDlg.data[1] == '1':
-    run = 1
-elif selectDlg.data[1] == '2':
-    run = 2
-elif selectDlg.data[1] == '3':
-    run = 3
-
+run = int(selectDlg.data[1])
 
 # Set stimPerRun for the audiolocalizer using input from the dialogue box
-stimPerRun = int(selectDlg.data[0])
+stimPerRun = 4
 
 # Setup for Button Box - Keyboard Input
 key_resp = keyboard.Keyboard()
@@ -83,9 +77,8 @@ _key_resp_allKeys = []
 #dataDir = "C:\\Users\\BrainDevLab\\Desktop\\localizer_deaf\\logfiles\\"
 # dataDir = "C:\\Users\\phoyos\\Desktop\\BrainDevLab_Code\\localizer\\logfiles\\"
 dataDir='/Users/bingli/Desktop/logFiles'
-
 filename = str(selectDlg.data[2])
-log_filename = dataDir + filename + '_loc_logfile_run' + str(run) + '.log'
+log_filename = f'{dataDir}/{filename}_loc_logfile_run_{run}.log'
 
 def log_msg(msg, filename=log_filename):
     print(msg)
@@ -103,19 +96,10 @@ for i in range(-1 * MR_settings['skip'], 0):
 counter = visual.TextStim(win0, height=.05, pos=(0, 0), color=win0.rgb + 0.5)
 output += u"  0    0.000 sync  [Start of scanning run, vol 0]\n"
 
-win = visual.Window([1920, 1080], units = 'pix', screen = 1)
-if run == 1:
-    message = visual.TextStim(win, text='Starting Run 1. Fixate on the central dot. Remember to press a button when an image repeats itself.')
-    message.autoDraw = True
-    win.flip()
-elif run == 2:
-    message = visual.TextStim(win, text='Starting Run 2. Fixate on the central dot. Remember to press a button when an image repeats itself.')
-    message.autoDraw = True
-    win.flip()
-elif run == 3:
-    message = visual.TextStim(win, text='Starting Run 3.Fixate on the central dot. Remember to press a button when an image repeats itself.')
-    message.autoDraw = True
-    win.flip()
+win = visual.Window([1920, 1080], units = 'pix', screen = 1, color='black')
+message = visual.TextStim(win, text=f'Starting Run {run}. Fixate on the central dot. Remember to press a button when an image repeats itself.')
+message.autoDraw = True
+win.flip()
 
 
 # launch: operator selects Scan or Test (emulate); see API documentation
@@ -132,7 +116,7 @@ win0.flip()
 
 duration = MR_settings['volumes'] * MR_settings['TR']
 # note: globalClock has been reset to 0.0 by launchScan()
-while globalClock.getTime() < duration:
+while globalClock.getTime() < duration: # initially always true, wait 10 seconds for stim to come on
     allKeys = event.getKeys()
     for key in allKeys:
         if key == MR_settings['sync']:
@@ -161,29 +145,49 @@ while globalClock.getTime() < duration:
             
             ## LOCALIZER CODE
             # Functions used for this script:
-            def play_stimuli(condition):
+            def play_stimuli(blocks, cond):
                 ''' This function takes creates a block by taking the first n stimuli in the condition list and 
                 playing each stimulus for 1 second each. Then, it deletes the n stimuli so that the next time that 
                 condition shows up in a run, it starts with the next n stimuli. n is defined by stimPerRun and is
                 the number of stimuli you want presented in a block.'''
+                import random
 
                 # First n stimuli in the block
-                stimuli = condition[0:stimPerRun]
+                stimuli = blocks[:stimPerRun]
+
                 # print(stimuli)
-                for i in range(0,len(stimuli)):
+                for stimulus in stimuli:
                     start = globalClock.getTime()
-                    print("inside play_stimuli: ", start)
-                    # Select stimulus
-                    stimulus = stimuli[i]
+                    log_msg(f'Stim onset: {start}')
                     # Initialize fixation point
-                    fixation = visual.Circle(win=win,radius = 5,pos=(0,0), lineColor='red', lineColorSpace='rgb',fillColor='red', fillColorSpace='rgb')
+                    fixation = visual.Circle(win=win,radius = 5,pos=(0,-30), lineColor='red', lineColorSpace='rgb',fillColor='red', fillColorSpace='rgb')
                     # Present image
-                    stim = visual.ImageStim(win, image=stimulus, size=[768,768])
+                    stim = visual.ImageStim(win, image=stimulus,pos=(0, -30))
+                    # Present rectangle either in similar or different orientations
+                    random_ori = random.randint(0, 3)
+                    if cond == 1:
+                        log_msg(f'Orientation: {random_ori}')
+                    if random_ori == 0:
+                        rect1 = visual.Rect(win=win, ori=0, width=100,height=40, pos=(500, 400), lineColor='red', fillColor='red')
+                        rect2 = visual.Rect(win=win, ori=90, width=100, height=40, pos=(-500, 400), lineColor='purple', fillColor='purple')
+                    elif random_ori == 1:
+                        rect1 = visual.Rect(win=win, ori=90, width=100,height=40, pos=(500, 400), lineColor='red', fillColor='red')
+                        rect2 = visual.Rect(win=win, ori=0, width=100, height=40, pos=(-500, 400), lineColor='purple', fillColor='purple')
+                    elif random_ori == 2:
+                        rect1 = visual.Rect(win=win, ori=90, width=100,height=40, pos=(500, 400), lineColor='red', fillColor='red')
+                        rect2 = visual.Rect(win=win, ori=90, width=100, height=40, pos=(-500, 400), lineColor='purple', fillColor='purple')
+                    else:
+                        rect1 = visual.Rect(win=win, ori=0, width=100,height=40, pos=(500, 400), lineColor='red', fillColor='red')
+                        rect2 = visual.Rect(win=win, ori=0, width=100, height=40, pos=(-500, 400), lineColor='purple', fillColor='purple')
                     stim.draw()
                     fixation.draw()
+                    # add rectangle 
+                    rect1.draw()
+                    rect2.draw()
                     win.flip()
+
                     # Check for keys during the image presentation
-                    duration = 0.2
+                    duration = 2   # duration updates here
                     end = start + duration
                     _key_resp_allKeys = []
                                         
@@ -193,45 +197,37 @@ while globalClock.getTime() < duration:
                         if len(_key_resp_allKeys):
                             key_resp.keys = _key_resp_allKeys[-1].name  # just the last key pressed
                             key_resp.rt = _key_resp_allKeys[-1].rt
-                            print(key_resp.keys) # tells you what key was pressed
+
                             # Store key press duration from start in log file
-                            log_msg(str(key_resp.rt))
+                            # log_msg(f'Button Time: {key_resp.rt}')
+                            log_msg(f'Button Pressed: {key_resp.keys}\n')
+
                             # Set key response back to null
                             _key_resp_allKeys = []
-                    # Remove the played stimuli
-                    condition.remove(stimuli[i])
                                
 
-            def execute_run(run, c1, c2, c3, c4, c5, c6, c7, c8):
+            def execute_run(blocks):
                 ''' This function loads the specific run and the corresponding conditions and presents the stimuli
                 for the appropriate blocks using play_stimuli '''
-                for block in blocks_runs[run]:
-                    if block == 0: #baseline
-                        print('baseline')
+                for block in blocks:
+                    for cond in range(2):
+                        if cond:
+                            instruction = visual.TextStim(win, text="Attend Bars", height=100, pos=(0, 0), color='white')
+                        else:
+                            instruction = visual.TextStim(win, text="Attend Face", height=100, pos=(0, 0), color='white')
+                        # Draw instruction
+                        instruction.draw()
                         win.flip()
-                        # Keep fixation point on gray screen
-                        fixation = visual.Circle(win=win,radius = 5,pos=(0,0), lineColor='red', lineColorSpace='rgb',fillColor='red', fillColorSpace='rgb')
+                        core.wait(3)
+                        win.flip()
+                        # baseline period
+                        fixation = visual.Circle(win=win,radius = 5,pos=(0,-30), lineColor='red', lineColorSpace='rgb',fillColor='red', fillColorSpace='rgb')
                         fixation.draw()
                         win.flip()
-                        core.wait(4.0) 
+                        core.wait(2)
                         win.flip()
-                    elif block== 1: #face
-                        play_stimuli(c1)
-                    elif block== 2: #hand
-                        play_stimuli(c2)
-                    elif block== 3: #word
-                        play_stimuli(c3)
-                    elif block== 4: #house
-                        play_stimuli(c4)
-                    elif block== 5: #foot
-                        play_stimuli(c5)
-                    elif block == 6: #car
-                        play_stimuli(c6)                    
-                    elif block == 7: #body
-                        play_stimuli(c7)
-                    elif block == 8:
-                        play_stimuli(c8)
-                    
+                        play_stimuli(block, cond)
+
                         
             def countdown():
                 ''' This function displays a countdown from 8 to 1 on the screen '''
@@ -267,12 +263,14 @@ while globalClock.getTime() < duration:
             # CD to the correct directory
             #os.chdir('/Users/gomezlab/Desktop/localizer/shined')
             os.chdir('/Users/bingli/Documents/NEU502b_experiment/emoFaces_cropped/lumMatch')
+            # os.chdir('/Users/ning.wang/502B_stuff/NEU502b_experiment/emoFaces_cropped/lumMatch')
             #os.chdir('/Users/braindevlab/Desktop/localizer_deaf/shined_all')
             #os.chdir('/Users/phoyos/Desktop/BrainDevLab_Code/localizer/shined_all')
             
             # Load in experiment parfile/outline
             #blocks_runs = pd.read_csv('~/Desktop/localizer/blocks_runs.csv')
-            blocks_runs = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/conditions_runs.csv')
+            conditions_df = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/conditions_runs.csv')
+            #conditions_df = pd.read_csv('/Users/ning.wang/502B_stuff/NEU502b_experiment/conditions_runs.csv')
             #blocks_runs = pd.read_csv('/Users/braindevlab/Desktop/localizer_deaf/blocks_runs.csv')
             # blocks_runs = pd.read_csv('/Users/phoyos/Desktop/BrainDevLab_Code/localizer/blocks_runs.csv')
 
@@ -282,73 +280,27 @@ while globalClock.getTime() < duration:
             # Load conditions
             # This CSV has columns for each run-condition combinations. 
             #conditions = pd.read_csv('~/Desktop/localizer/2back_half_conditions.csv')
-            conditions = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/emoFaces_blocks.csv')
+            blocks_df = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/emoFaces_blocks.csv')
 #            conditions = pd.read_csv('/Users/braindevlab/Desktop/localizer_deaf/2back_half_conditions.csv')
             #conditions = pd.read_csv('/Users/phoyos/Desktop/BrainDevLab_Code/localizer/2back_half_conditions.csv')
 
             #The lines below turn these columns into lists we can access in our script.
             #Run 1 Conditions
-            r1b1=conditions.r1b1.to_list()
-            r1b2=conditions.r1b2.to_list()
-            r1b3=conditions.r1b3.to_list()
-            r1b4=conditions.r1b4.to_list()
-            r1b5=conditions.r1b5.to_list()
-            r1b6=conditions.r1b6.to_list()
-            r1b7=conditions.r1b7.to_list()
-            r1b8=conditions.r1b8.to_list()
-
-            #Run 2 Conditions
-            r2b1=conditions.r2b1.to_list()
-            r2b2=conditions.r2b2.to_list()
-            r2b3=conditions.r2b3.to_list()
-            r2b4=conditions.r2b4.to_list()
-            r2b5=conditions.r2b5.to_list()
-            r2b6=conditions.r2b6.to_list()
-            r2b7=conditions.r2b7.to_list()
-            r2b8=conditions.r2b8.to_list()
-
-            #Run 3 Condtions
-            r3b1=conditions.r3b1.to_list()
-            r3b2=conditions.r3b2.to_list()
-            r3b3=conditions.r3b3.to_list()
-            r3b4=conditions.r3b4.to_list()
-            r3b5=conditions.r3b5.to_list()
-            r3b6=conditions.r3b6.to_list()
-            r3b7=conditions.r3b7.to_list()
-            r3b8=conditions.r3b8.to_list()
-
-        
+            blocks = []
+            for block_id in range(1,9):
+                blocks.append(blocks_df[f'r{run}b{block_id}'].to_list())
+                
             # All set up. Time to run the experiment!!!
             # Open a window (window opened at the beginning; screen = 0 is your computer, screen = 1 is the monitor)
 #            win = visual.Window([1920, 1080], units = 'pix', screen = 1)
             ## To quit at any time: press command + q. This can be changed in File/Preferences/Key Bindings
 
             # Execute run picked at the beginning of the scan
-            if run == 1:
-                # Run 1
-                message.text = ' ' # clears the text
-                win.flip() 
-                countdown()
-                execute_run('run1', r1b1,r1b2,r1b3,r1b4,r1b5,r1b6,r1b7,r1b8)
-            elif run == 2:
-                # Run 2
-                message.text = ' '
-                win.flip() 
-                countdown()
-                execute_run('run2', r2c1,r2c2,r2c3,r2c4,r2c5,r2c6,r2c7)
-            elif run ==3:
-                # Run 3
-                message.text = ' '
-                win.flip() 
-                countdown()
-                execute_run('run3', r3c1,r3c2,r3c3,r3c4,r3c5,r3c6,r3c7)
-            elif run ==4:
-                # Run 4
-                message.text = ' '
-                win.flip() 
-                countdown()
-                execute_run('run4', r4c1,r4c2,r4c3,r4c4,r4c5,r4c6,r4c7)
-                
+            message.text = ' ' # clears the text
+            win.flip() 
+            countdown()
+            execute_run(blocks)
+            
             win.flip()
             message.text = 'Run finished!:) Please wait...'
             message.autoDraw = True
@@ -380,4 +332,3 @@ print(output)
 
 win.close()
 core.quit()
-
