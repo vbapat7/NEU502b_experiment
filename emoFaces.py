@@ -78,12 +78,18 @@ _key_resp_allKeys = []
 # dataDir = "C:\\Users\\phoyos\\Desktop\\BrainDevLab_Code\\localizer\\logfiles\\"
 dataDir='/Users/bingli/Desktop/logFiles'
 filename = str(selectDlg.data[2])
-log_filename = f'{dataDir}/{filename}_loc_logfile_run_{run}.log'
+#log_filename = f'{dataDir}/{filename}_loc_logfile_run_{run}.log'
+log_filename = f'{dataDir}/{filename}_loc_logfile_run_{run}.csv'
 
 def log_msg(msg, filename=log_filename):
     print(msg)
     with open(filename, 'a') as f:
         f.write(msg + '\n')
+
+log_dict = {
+    'Event Type': [], 
+    'Event Value': [], 
+}
 
 win0 = visual.Window(fullscr=False, screen = 0)
 globalClock = core.Clock()
@@ -121,7 +127,8 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
     for key in allKeys:
         if key == MR_settings['sync']:
             onset = globalClock.getTime()
-            print("check for equal key: ", onset)
+            log_dict['Event Type'].append('Sync Time')
+            log_dict['Event Value'].append(onset)
             
             # do your experiment code at this point if you want it sync'd to the TR
             ### Start of experiment code ###
@@ -145,7 +152,7 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
             
             ## LOCALIZER CODE
             # Functions used for this script:
-            def play_stimuli(blocks, cond):
+            def play_stimuli(blocks, cond, block_start_time, duration=2):
                 ''' This function takes creates a block by taking the first n stimuli in the condition list and 
                 playing each stimulus for 1 second each. Then, it deletes the n stimuli so that the next time that 
                 condition shows up in a run, it starts with the next n stimuli. n is defined by stimPerRun and is
@@ -155,10 +162,20 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
                 # First n stimuli in the block
                 stimuli = blocks[:stimPerRun]
 
+                # log_dict['Event Type'].append(f'Play Stim Block Start Time')
+                # log_dict['Event Value'].append(block_start_time)
+                # log_dict['Event Type'].append(f'Stim Duration')
+                # log_dict['Event Value'].append(duration)
+
                 # print(stimuli)
-                for stimulus in stimuli:
-                    start = globalClock.getTime()
-                    log_msg(f'Stim onset: {start}')
+                for idx, stimulus in enumerate(stimuli):
+                    log_dict['Event Type'].append(f'Stim {idx} Onset')
+                    log_dict['Event Value'].append(globalClock.getTime())
+
+                    expected_stim_end_time = block_start_time + (idx + 1) * duration
+                    # log_dict['Event Type'].append(f'Stim {idx} Expected Completion')
+                    # log_dict['Event Value'].append(expected_stim_end_time)
+
                     # Initialize fixation point
                     fixation = visual.Circle(win=win,radius = 5,pos=(0,-30), lineColor='red', lineColorSpace='rgb',fillColor='red', fillColorSpace='rgb')
                     # Present image
@@ -166,7 +183,8 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
                     # Present rectangle either in similar or different orientations
                     random_ori = random.randint(0, 3)
                     if cond == 1:
-                        log_msg(f'Orientation: {random_ori}')
+                        log_dict['Event Type'].append(f'Bar Orientation')
+                        log_dict['Event Value'].append(float(random_ori))
                     if random_ori == 0:
                         rect1 = visual.Rect(win=win, ori=0, width=100,height=40, pos=(500, 400), lineColor='red', fillColor='red')
                         rect2 = visual.Rect(win=win, ori=90, width=100, height=40, pos=(-500, 400), lineColor='purple', fillColor='purple')
@@ -187,11 +205,10 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
                     win.flip()
 
                     # Check for keys during the image presentation
-                    duration = 2   # duration updates here
-                    end = start + duration
+                    # end = start + duration
                     _key_resp_allKeys = []
                                         
-                    while globalClock.getTime() < end:
+                    while globalClock.getTime() < expected_stim_end_time:
                         theseKeys = key_resp.getKeys(keyList=['1', '2', '3','4'], waitRelease=False) #button box inputs
                         _key_resp_allKeys.extend(theseKeys)
                         if len(_key_resp_allKeys):
@@ -199,36 +216,70 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
                             key_resp.rt = _key_resp_allKeys[-1].rt
 
                             # Store key press duration from start in log file
-                            # log_msg(f'Button Time: {key_resp.rt}')
-                            log_msg(f'Button Pressed: {key_resp.keys}\n')
+                            log_dict['Event Type'].append(f'Button Pressed')
+                            log_dict['Event Value'].append(float(key_resp.keys))
 
                             # Set key response back to null
                             _key_resp_allKeys = []
+
+                    # log_dict['Event Type'].append(f'Stim {idx} Finished')
+                    # log_dict['Event Value'].append(globalClock.getTime())
                                
 
-            def execute_run(blocks):
+            def execute_run(blocks, execute_run_start_time, stim_per_run, duration=2, instruction_time=3, baseline_time=2):
                 ''' This function loads the specific run and the corresponding conditions and presents the stimuli
                 for the appropriate blocks using play_stimuli '''
-                for block in blocks:
+
+                block_length = instruction_time + baseline_time + stim_per_run * duration
+                for idx, block in enumerate(blocks):
+                    block_start_time = execute_run_start_time + idx * block_length * 2
+                    # log_dict['Event Type'].append(f'Blockx2 {idx} Start')
+                    # log_dict['Event Value'].append(block_start_time)
                     for cond in range(2):
-                        if cond:
-                            instruction = visual.TextStim(win, text="Attend Bars", height=100, pos=(0, 0), color='white')
-                        else:
-                            instruction = visual.TextStim(win, text="Attend Face", height=100, pos=(0, 0), color='white')
+                        instruction = visual.TextStim(
+                            win, 
+                            text="Attend Bars" if cond else "Attend Face", 
+                            height=100, 
+                            pos=(0, 0), 
+                            color='white', 
+                        )
+
                         # Draw instruction
                         instruction.draw()
                         win.flip()
-                        core.wait(3)
+                        # core.wait(instruction_time)
+                        # log_dict['Event Type'].append(f'Instruction Start')
+                        # log_dict['Event Value'].append(block_start_time + cond * block_length)
+                        while globalClock.getTime() < block_start_time + cond * block_length + instruction_time:
+                            pass
                         win.flip()
+
                         # baseline period
                         fixation = visual.Circle(win=win,radius = 5,pos=(0,-30), lineColor='red', lineColorSpace='rgb',fillColor='red', fillColorSpace='rgb')
                         fixation.draw()
                         win.flip()
-                        core.wait(2)
+                        # core.wait(baseline_time)
+                        # log_dict['Event Type'].append(f'Baseline Start')
+                        # log_dict['Event Value'].append(block_start_time + cond * block_length + instruction_time)
+                        while globalClock.getTime() < block_start_time + cond * block_length + instruction_time + baseline_time:
+                            pass
                         win.flip()
-                        play_stimuli(block, cond)
+
+                        stimuli_start_time = block_start_time + cond * block_length + instruction_time + baseline_time
+                        play_stimuli(block, cond, stimuli_start_time)
 
                         
+            # def countdown(countdown_start, countdown_duration=8):
+            #     ''' This function displays a countdown from 8 to 1 on the screen '''
+            #     win.flip()
+            #     for _ in range(countdown_duration):
+            #         message = visual.TextStim(win, text = f'{_}')
+            #         message.autoDraw = True
+            #         win.flip()
+            #         while globalClock.getTime() < countdown_start + _:
+            #             pass
+            #     message.text = ' '
+            #     win.flip()
             def countdown():
                 ''' This function displays a countdown from 8 to 1 on the screen '''
                 win.flip()
@@ -298,8 +349,13 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
             # Execute run picked at the beginning of the scan
             message.text = ' ' # clears the text
             win.flip() 
+            # countdown(countdown_start_time)
             countdown()
-            execute_run(blocks)
+            run_start_time = globalClock.getTime()
+            execute_run(blocks, run_start_time, stim_per_run=stimPerRun)
+
+            log_df = pd.DataFrame(log_dict)
+            log_df.to_csv(log_filename)
             
             win.flip()
             message.text = 'Run finished!:) Please wait...'
