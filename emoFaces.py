@@ -20,12 +20,16 @@ EDH Nov 2024: Updated for 2024 psychoPy version + use on PC:
 """
 
 from __future__ import absolute_import, division, print_function
+import os 
+import sys
+import pandas as pd
 
 from builtins import str
 from builtins import range
 from psychopy import visual, event, core, gui
 
-# 2024 addition to fix bug in emulator 
+
+# 2024 addition to fix bug in emulat1or 
 #from psychopy import plugins
 #plugins.activatePlugins()
 
@@ -38,7 +42,7 @@ from psychopy.hardware import keyboard
 MR_settings = {
     'TR': 2.000,     # duration (sec) per whole-brain volume
     'volumes': 5,    # number of whole-brain 3D volumes per scanning run
-    'sync': 'equal', # character to use as the sync timing event; assumed to come at start of a volume
+    'sync': '5', # character to use as the sync timing event; assumed to come at start of a volume
     'skip': 0,       # number of volumes lacking a sync pulse at start of scan (for T1 stabilization)
 #    'sound': True    # in test mode: play a tone as a reminder of scanner noise # Commented 2024
     }
@@ -71,11 +75,7 @@ key_resp.keys = []
 key_resp.rt = []
 _key_resp_allKeys = []
 
-#dataDir = '/Users/gomezlab/Desktop/localizer/logfiles/'
-#dataDir = '/Volumes/gomez/data/deaf/princetonLoc/code/experiment/logfiles/'
-#dataDir = '/Users/braindevlab/Desktop/localizer_deaf/logfiles/'
-#dataDir = "C:\\Users\\BrainDevLab\\Desktop\\localizer_deaf\\logfiles\\"
-# dataDir = "C:\\Users\\phoyos\\Desktop\\BrainDevLab_Code\\localizer\\logfiles\\"
+# save logFiles
 dataDir='/Users/bingli/Desktop/logFiles'
 filename = str(selectDlg.data[2])
 #log_filename = f'{dataDir}/{filename}_loc_logfile_run_{run}.log'
@@ -102,14 +102,15 @@ for i in range(-1 * MR_settings['skip'], 0):
 counter = visual.TextStim(win0, height=.05, pos=(0, 0), color=win0.rgb + 0.5)
 output += u"  0    0.000 sync  [Start of scanning run, vol 0]\n"
 
-win = visual.Window([1920, 1080], units = 'pix', screen = 1, color='black')
-message = visual.TextStim(win, text=f'Starting Run {run}. Fixate on the central dot. Remember to press a button when an image repeats itself.')
+win = visual.Window([1920, 1080], units = 'pix', screen = 1, color='black', fullscr=True)
+message = visual.TextStim(win, height=70,
+                          text=f'Starting Run {run}. Fixate on the central dot at all time.')
 message.autoDraw = True
 win.flip()
 
 
 # launch: operator selects Scan or Test (emulate); see API documentation
-vol = launchScan(win0, MR_settings, globalClock=globalClock, mode='Test') # Added mode param in 2024
+vol = launchScan(win0, MR_settings, globalClock=globalClock, mode='Scan') # Added mode param in 2024
 #counter.setText(u"%d volumes\n%.3f seconds" % (0, 0.0))
 #counter.draw()
 waiting = visual.TextStim(win0, height=.05, pos=(0, 0), color=win0.rgb + 0.5, text = 'Experiment will start when scanner sends equals sign.')
@@ -117,10 +118,19 @@ waiting.draw()
 win0.flip()
 
 
+# CD to the correct directory
+os.chdir('/Users/bingli/Documents/NEU502b_experiment/emoFaces_cropped/lumMatch')
+conditions_df = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/conditions_runs.csv')
+blocks_df = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/emoFaces_blocks.csv')
+#Run 1 Conditions
+blocks = []
+for block_id in range(1,9):
+    blocks.append(blocks_df[f'r{run}b{block_id}'].to_list())
 
-#core.wait(3.0)
 
-duration = MR_settings['volumes'] * MR_settings['TR']
+#duration = MR_settings['volumes'] * MR_settings['TR']
+duration = 60
+
 # note: globalClock has been reset to 0.0 by launchScan()
 while globalClock.getTime() < duration: # initially always true, wait 10 seconds for stim to come on
     allKeys = event.getKeys()
@@ -221,6 +231,11 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
 
                             # Set key response back to null
                             _key_resp_allKeys = []
+                        allKeys = event.getKeys()
+                        if 'q' in allKeys:
+                            log_df = pd.DataFrame(log_dict)
+                            log_df.to_csv(log_filename)
+                            sys.exit()
 
                     # log_dict['Event Type'].append(f'Stim {idx} Finished')
                     # log_dict['Event Value'].append(globalClock.getTime())
@@ -251,7 +266,11 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
                         # log_dict['Event Type'].append(f'Instruction Start')
                         # log_dict['Event Value'].append(block_start_time + cond * block_length)
                         while globalClock.getTime() < block_start_time + cond * block_length + instruction_time:
-                            pass
+                            allKeys = event.getKeys()
+                            if 'q' in allKeys:
+                                log_df = pd.DataFrame(log_dict)
+                                log_df.to_csv(log_filename)
+                                sys.exit()
                         win.flip()
 
                         # baseline period
@@ -262,7 +281,11 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
                         # log_dict['Event Type'].append(f'Baseline Start')
                         # log_dict['Event Value'].append(block_start_time + cond * block_length + instruction_time)
                         while globalClock.getTime() < block_start_time + cond * block_length + instruction_time + baseline_time:
-                            pass
+                            allKeys = event.getKeys()
+                            if 'q' in allKeys:
+                                log_df = pd.DataFrame(log_dict)
+                                log_df.to_csv(log_filename)
+                                sys.exit()
                         win.flip()
 
                         stimuli_start_time = block_start_time + cond * block_length + instruction_time + baseline_time
@@ -283,7 +306,7 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
             def countdown():
                 ''' This function displays a countdown from 8 to 1 on the screen '''
                 win.flip()
-                message = visual.TextStim(win, text = '8')
+                message = visual.TextStim(win, text = '8', height = 50)
                 message.autoDraw = True
                 win.flip()
                 core.wait(1.0)
@@ -311,36 +334,7 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
                 message.text = ' '
                 win.flip()
 
-            # CD to the correct directory
-            #os.chdir('/Users/gomezlab/Desktop/localizer/shined')
-            os.chdir('/Users/bingli/Documents/NEU502b_experiment/emoFaces_cropped/lumMatch')
-            # os.chdir('/Users/ning.wang/502B_stuff/NEU502b_experiment/emoFaces_cropped/lumMatch')
-            #os.chdir('/Users/braindevlab/Desktop/localizer_deaf/shined_all')
-            #os.chdir('/Users/phoyos/Desktop/BrainDevLab_Code/localizer/shined_all')
-            
-            # Load in experiment parfile/outline
-            #blocks_runs = pd.read_csv('~/Desktop/localizer/blocks_runs.csv')
-            conditions_df = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/conditions_runs.csv')
-            #conditions_df = pd.read_csv('/Users/ning.wang/502B_stuff/NEU502b_experiment/conditions_runs.csv')
-            #blocks_runs = pd.read_csv('/Users/braindevlab/Desktop/localizer_deaf/blocks_runs.csv')
-            # blocks_runs = pd.read_csv('/Users/phoyos/Desktop/BrainDevLab_Code/localizer/blocks_runs.csv')
 
-            # How many stimuli should be played per run?
-            # stimPerRun = 8  #This should be selected in the window at the start of the experiment
-
-            # Load conditions
-            # This CSV has columns for each run-condition combinations. 
-            #conditions = pd.read_csv('~/Desktop/localizer/2back_half_conditions.csv')
-            blocks_df = pd.read_csv('/Users/bingli/Documents/NEU502b_experiment/emoFaces_blocks.csv')
-#            conditions = pd.read_csv('/Users/braindevlab/Desktop/localizer_deaf/2back_half_conditions.csv')
-            #conditions = pd.read_csv('/Users/phoyos/Desktop/BrainDevLab_Code/localizer/2back_half_conditions.csv')
-
-            #The lines below turn these columns into lists we can access in our script.
-            #Run 1 Conditions
-            blocks = []
-            for block_id in range(1,9):
-                blocks.append(blocks_df[f'r{run}b{block_id}'].to_list())
-                
             # All set up. Time to run the experiment!!!
             # Open a window (window opened at the beginning; screen = 0 is your computer, screen = 1 is the monitor)
 #            win = visual.Window([1920, 1080], units = 'pix', screen = 1)
@@ -376,7 +370,7 @@ while globalClock.getTime() < duration: # initially always true, wait 10 seconds
         else:
             # handle keys (many fiber-optic buttons become key-board key-presses)
             output += u"%3d  %7.3f %s\n" % (vol-1, globalClock.getTime(), str(key))
-            if key == 'escape':
+            if key == 'q':
                 output += u'user cancel, '
                 break
 
