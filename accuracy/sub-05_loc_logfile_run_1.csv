@@ -1,0 +1,162 @@
+,Event Type,Event Value,ImageID,ExpectedResp,Correct? (1 = M/Diff)
+0,Sync Time,1.5009214519959642,,,
+1,Stim 0 Onset,14.568248320996645,,,
+2,Button Pressed,2,20 (NEU_F20),2,1
+3,Stim 1 Onset,16.56501656299224,,,
+4,Button Pressed,1,2 (FEA_M11),1,1
+5,Stim 2 Onset,18.564587643995765,,,
+6,Button Pressed,2,4 (HAP_F02),2,1
+7,Stim 3 Onset,20.564862347993767,,,
+8,Button Pressed,2,23 (FEA_F30),2,1
+9,Stim 0 Onset,27.568156103996444,,,
+10,Bar Orientation,0,diffOri,1,0
+11,Stim 1 Onset,29.564831512994715,,,
+12,Bar Orientation,3,sameOri,2,
+13,Button Pressed,1,,,
+14,Button Pressed,2,,,1
+15,Stim 2 Onset,31.564730514000985,,,
+16,Bar Orientation,0,diffOri,1,
+17,Button Pressed,1,,,1
+18,Stim 3 Onset,33.564645655002096,,,
+19,Bar Orientation,0,sameOri,2,
+20,Button Pressed,1,,,0
+21,Stim 0 Onset,40.56897864899656,,,
+22,Button Pressed,1,11 (HAP_M06),1,1
+23,Stim 1 Onset,42.564783281995915,,,
+24,Button Pressed,2,17 (NEU_F05),2,1
+25,Stim 2 Onset,44.56477434,,,
+26,Button Pressed,2,5 (HAP_F03),2,1
+27,Stim 3 Onset,46.565004559000954,,,
+28,Button Pressed,2,19 (NEU_F13),2,1
+29,Stim 0 Onset,53.568961270997534,,,
+30,Bar Orientation,0,,,
+31,Button Pressed,1,diffOri,1,1
+32,Stim 1 Onset,55.564548485999694,,,
+33,Bar Orientation,3,,,
+34,Button Pressed,2,sameOri,2,1
+35,Stim 2 Onset,57.56461440199928,,,
+36,Bar Orientation,3,sameOri,NR,0
+37,Stim 3 Onset,59.56454813700111,,,
+38,Bar Orientation,0,diffOri,1,1
+39,Button Pressed,1,,,
+40,Stim 0 Onset,66.56927329699101,,,0
+41,Stim 1 Onset,68.56496175199572,,,
+42,Button Pressed,2,16 (NEU_F01),2,1
+43,Button Pressed,2,8 (HAP_F19),2,1
+44,Stim 2 Onset,70.56499046499084,,,
+45,Button Pressed,2,6 (HAP_F11),2,1
+46,Stim 3 Onset,72.56475564799621,,,
+47,Button Pressed,1,32 (FEA_M09),1,1
+48,Stim 0 Onset,79.56834025999706,,,
+49,Bar Orientation,3,sameOri,2,0
+50,Stim 1 Onset,81.56457989499904,,,
+51,Bar Orientation,1,diffOri,1,0
+52,Button Pressed,2,,,
+53,Button Pressed,1,,,
+54,Stim 2 Onset,83.56453134299954,,,
+55,Bar Orientation,1,diffOri,1,1
+56,Button Pressed,1,,,
+57,Stim 3 Onset,85.56466771099076,,,
+58,Bar Orientation,0,diffOri,1,1
+59,Button Pressed,1,,,
+60,Stim 0 Onset,92.56788217,,,
+61,Button Pressed,1,14 (HAP_M23),1,1
+62,Stim 1 Onset,94.56471868300287,,,
+63,Button Pressed,1,25 (NEU_M24),1,1
+64,Stim 2 Onset,96.56493696199323,,,
+65,Button Pressed,1,10 (HAP_M05),1,1
+66,Stim 3 Onset,98.56494779899367,,,
+67,Button Pressed,2,12 (FEA_F29),2,1
+68,Stim 0 Onset,105.56790896499297,,,
+69,Bar Orientation,2,sameOri,2,1
+70,Button Pressed,2,,,
+71,Stim 1 Onset,107.56462236799416,,,
+72,Bar Orientation,3,sameOri,2,1
+73,Button Pressed,2,,,
+74,Stim 2 Onset,109.56486646999838,,,
+75,Bar Orientation,3,sameOri,2,1
+76,Button Pressed,2,,,
+77,Stim 3 Onset,111.56461667799158,,,
+78,Bar Orientation,1,diffOri,1,1
+79,Button Pressed,1,,,
+80,Stim 0 Onset,118.56873866300157,,,
+81,Button Pressed,1,13 (HAP_M22),1,1
+82,Stim 1 Onset,120.56488758299383,,,
+83,Button Pressed,1,3 (FEA_M12),1,1
+84,Stim 2 Onset,122.5647785,,,
+85,Button Pressed,2,28 (FEA_F31),2,1
+86,Stim 3 Onset,124.56492647099367,,,
+87,Button Pressed,2,18 (NEU_F07),2,1
+88,Stim 0 Onset,131.56862352899043,,,
+89,Bar Orientation,0,diffOri,1,1
+90,Button Pressed,1,,,
+91,Stim 1 Onset,133.56567933299812,,,
+92,Bar Orientation,1,diffOri,1,1
+93,Button Pressed,1,,,
+94,Stim 2 Onset,135.5645929549937,,,
+95,Bar Orientation,2,sameOri,2,1
+96,Button Pressed,2,,,
+97,Stim 3 Onset,137.56466212800296,,,
+98,Bar Orientation,1,diffOri,1,1
+99,Button Pressed,1,,,
+100,Stim 0 Onset,144.56785911199404,,,
+101,Button Pressed,2,1 (FEA_F09),2,1
+102,Stim 1 Onset,146.56459005999204,,,
+103,Button Pressed,1,9 (HAP_M03),1,1
+104,Stim 2 Onset,148.56459973400342,,,
+105,Button Pressed,2,7 (HAP_F16),2,1
+106,Stim 3 Onset,150.564972,,,
+107,Button Pressed,1,15 (HAP_M25),1,1
+108,Stim 0 Onset,157.56836030200066,,,
+109,Bar Orientation,1,diffOri,1,1
+110,Button Pressed,1,,,
+111,Stim 1 Onset,159.56494722299976,,,
+112,Bar Orientation,2,sameOri,2,1
+113,Button Pressed,2,,,
+114,Stim 2 Onset,161.56534116799594,,,
+115,Bar Orientation,1,diffOri,1,1
+116,Button Pressed,1,,,
+117,Stim 3 Onset,163.56508022999333,,,
+118,Bar Orientation,0,diffOri,1,1
+119,Button Pressed,1,,,
+120,Stim 0 Onset,170.5679594809917,,,
+121,Button Pressed,1,26 (NEU_M29),1,1
+122,Stim 1 Onset,172.56489984699874,,,
+123,Button Pressed,2,24 (NEU_M18),1,0
+124,Stim 2 Onset,174.5648241710005,,,
+125,Button Pressed,1,22 (NEU_M17),1,1
+126,Stim 3 Onset,176.56467807099398,,,
+127,Button Pressed,2,29 (FEA_F33),2,1
+128,Stim 0 Onset,183.56790354999248,,,
+129,Bar Orientation,3,sameOri,2,1
+130,Button Pressed,2,,,
+131,Stim 1 Onset,185.5645752279961,,,
+132,Bar Orientation,0,diffOri,1,1
+133,Button Pressed,1,,,
+134,Stim 2 Onset,187.56494110499625,,,
+135,Bar Orientation,3,sameOri,2,1
+136,Button Pressed,2,,,
+137,Stim 3 Onset,189.5647958769987,,,
+138,Bar Orientation,0,diffOri,1,0
+139,Button Pressed,2,,,
+140,Stim 0 Onset,196.56884969699604,,,
+141,Button Pressed,1,21 (NEU_M13),1,0
+142,Button Pressed,2,,,
+143,Stim 1 Onset,198.5648320879991,,,
+144,Button Pressed,1,31 (FEA_M08),1,1
+145,Stim 2 Onset,200.56462725899473,,,
+146,Button Pressed,2,27 (NEU_M31),1,0
+147,Stim 3 Onset,202.56478094299382,,,
+148,Button Pressed,2,30 (FEA_F35),2,1
+149,Stim 0 Onset,209.56790953000018,,,
+150,Bar Orientation,3,sameOri,2,1
+151,Button Pressed,2,,,
+152,Stim 1 Onset,211.5646938199934,,,
+153,Bar Orientation,2,sameOri,2,0
+154,Button Pressed,1,,,
+155,Stim 2 Onset,213.5646072380041,,,
+156,Bar Orientation,0,diffOri,1,1
+157,Button Pressed,1,,,
+158,Stim 3 Onset,215.5645554090006,,,
+159,Bar Orientation,3,sameOri,2,1
+160,Button Pressed,2,,,
